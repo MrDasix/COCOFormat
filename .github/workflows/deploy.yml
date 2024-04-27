@@ -1,0 +1,20 @@
+# Workflow to deploy files to an nginx server
+name: Deploy to Nginx Server
+
+on:
+  push:
+    branches:
+      - main  # or specify your branch
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: debian-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Nginx Server
+        run: scp -r * dasix@cocoformat.com:/var/www/cocoformat
+
