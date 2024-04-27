@@ -22,4 +22,3 @@ jobs:
             chmod 700 ~/.ssh/id_rsa
             ssh-keyscan -H domain.com >> ~/.ssh/known_hosts
             scp -o StrictHostKeyChecking=no index.html dasix@cocoformat.com:.
-            # scp -i ${{ secrets.SERVER_SSH_PRIVATE_KEY }} index.html dasix@cocoformat.com:.
