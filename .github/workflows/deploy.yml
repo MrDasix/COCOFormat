@@ -19,7 +19,10 @@ jobs:
         run: mkdir -p ~/.ssh
 
       - name: Write SSH private key
-        run: echo "${{ secrets.SERVER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+        run: echo "${{ secrets.SERVER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+
+      - name: Change Permisions
+        run: chmod 600 ~/.ssh/id_rsa
 
       # Add the server to known hosts to avoid prompts
       - name: Add server to known hosts
