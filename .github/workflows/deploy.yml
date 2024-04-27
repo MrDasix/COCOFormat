@@ -15,11 +15,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Write SSH private key
+        run: echo " ${{ secrets.SERVER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+
+      # Add the server to known hosts to avoid prompts
+      - name: Add server to known hosts
+        run: ssh-keyscan -H cocoformat.com >> ~/.ssh/known_hosts
+      
+      # Deploy files using SCP
       - name: Deploy to Nginx Server
-        run: |
-            mkdir -p ~/.ssh
-            echo "${{ secrets.SERVER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-            cat ~/.ssh/id_rsa
-            chmod 700 ~/.ssh/id_rsa
-            ssh-keyscan -H cocoformat.com >> ~/.ssh/known_hosts
-            scp -o StrictHostKeyChecking=no index.html dasix@cocoformat.com:.
+        run: scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r index.html dasix@cocoformat.com:.
