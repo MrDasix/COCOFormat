@@ -15,6 +15,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check files
+        uses: ls -la
+
       - name: Deploy to Nginx Server
         run: scp -i ${{ secrets.SERVER_SSH_PRIVATE_KEY }} index.html dasix@cocoformat.com:.
 
