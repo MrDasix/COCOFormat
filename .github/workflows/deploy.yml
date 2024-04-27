@@ -27,4 +27,4 @@ jobs:
       
       # Deploy files using SCP
       - name: Deploy to Nginx Server
-        run: scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r index.html dasix@cocoformat.com:.
+        run: scp -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r index.html dasix@cocoformat.com:.
