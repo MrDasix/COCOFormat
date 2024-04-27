@@ -545,34 +545,38 @@
                         ctx.strokeRect(bbox[0], bbox[1], bbox[2], bbox[3]);
                     }                    
                 });
+                
+                var rightPanel = document.getElementById('canvasPanel');
+                console.log(this.width)
+                console.log(canvas.height)
+
+                if (this.width < this.height){
+                    rightPanel.style.flexDirection = 'row';
+                }else{
+                    rightPanel.style.flexDirection = 'column';
+                }
             };
             document.getElementById('image-name').innerHTML = _json.images[image_num].file_name
-
-            var rightPanel = document.getElementById('canvasPanel');
-            var canvas = document.getElementById('imageCanvas');
-            
-            if (canvas.width > canvas.height) {
-                rightPanel.style.flexDirection = 'row';
-            } else {
-                rightPanel.style.flexDirection = 'column';
-            } 
         }
         
-        function updateSelector(){
+        function updateSelector(json, imageValue = 0){
             var select = document.getElementById('image-select');
             select.innerHTML = '';
-            _json.images.forEach(function(image, i) {
+            json.images.forEach(function(image, i) {
                 var option = document.createElement('option');
                 option.value = i;
                 option.textContent = image.id;
                 select.appendChild(option);
             });
+
+            select.selectedIndex = imageValue;
+            select.dispatchEvent(new Event('change'));
         }
         
         editor.setValue(jsonData); 
         _json = JSON.parse(editor.getValue());
         _imageValue = 0;
-        updateSelector();
+        updateSelector(_json, _imageValue);
         updateImage(_imageValue);
 
         document.getElementById('image-select').addEventListener('change', function() {
@@ -582,8 +586,8 @@
 
         editor.on('change', function() {
             _json = JSON.parse(editor.getValue());
-            updateSelector();
-            updateImage(_imageValue);
+            updateSelector(_json, _imageValue);
+            // updateImage(_imageValue);
         });
 
 
