@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/addon/fold/brace-fold.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/addon/fold/foldgutter.min.css"></script>
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            height: 100%;
+        }
+        .left-panel, .right-panel {
+            width: 50%;
+            height: 100%;
+            overflow: auto;
+        }
+        .right-panel{
+            display: flex;
+            flex-direction: column;
+        }
+        #canvasPanel {
+            display: flex;
+            align-content: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 10px;
+        }
+        .code {
+            height: 100%;
+        }
+        .CodeMirror {
+            height: 100%;
+        }
+        .image-info{
+            height: 10%;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                flex-direction: column;
+            }
+            .left-panel, .right-panel {
+                width: 100%;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <textarea id="json-data" class="code"></textarea>
+        </div>
+        <div class="right-panel">
+            <div class="image-info">
+                <h2 id="image-name">File_Name</h2>
+                <label for="image-select">Choose an image ID</label>
+                <select id="image-select">
+                    <!-- Image IDs will be added dynamically here -->
+                </select>
+            </div>
+            <div id="canvasPanel">
+                <canvas id="imageCanvas"></canvas>
+            </div>            
+        </div>
+    </div>
+
+    <script>
+        var editor = CodeMirror.fromTextArea(document.getElementById("json-data"), {
+            lineNumbers: true,
+            mode: "application/json",
+            theme: "dracula",
+            foldGutter: true,
+            lineWrapping:true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+        });
+
+        var jsonData = `
+{
+    "info": {
+        "description": "COCO 2017 Dataset",
+        "url": "http://cocodataset.org",
+        "version": "1.0",
+        "year": 2017,
+        "contributor": "COCO Consortium",
+        "date_created": "2017/09/01"
+    },
+    "licenses": [
+        {"url": "http://creativecommons.org/licenses/by/2.0/", 
+        "id": 4, 
+        "name": "Attribution License"}
+    ],
+    "images": [
+        {"id": 242287, 
+        "license": 4, 
+        "coco_url": "http://images.cocodataset.org/val2017/000000242287.jpg", 
+        "flickr_url": "http://farm3.staticflickr.com/2626/000000242287.jpg", 
+        "width": 426, "height": 640, 
+        "file_name": "000000242287.jpg", 
+        "date_captured": "2013-11-15 02:41:42"},
+
+        {"id": 245915, 
+        "license": 4, 
+        "coco_url": "http://images.cocodataset.org/val2017/000000245915.jpg", 
+        "flickr_url": "http://farm1.staticflickr.com/88/000000245915.jpg", 
+        "width": 640, "height": 480, 
+        "file_name": "000000245915.jpg", 
+        "date_captured": "2013-11-18 02:53:27"}
+    ],
+    "annotations": [
+        {"id": 125686, 
+        "category_id": 0, 
+        "iscrowd": 0, 
+        "segmentation": [], 
+        "image_id": 242287, 
+        "area": 42061.80340000001, 
+        "bbox": [19.23, 383.18, 314.5, 244.46]},
+
+        {"id": 1409619, 
+        "category_id": 0, 
+        "iscrowd": 0, 
+        "segmentation": [], 
+        "image_id": 245915, 
+        "area": 3556.2197000000015, 
+        "bbox": [399, 251, 155, 101]},
+
+        {"id": 1410165, 
+        "category_id": 1, 
+        "iscrowd": 0, 
+        "segmentation": [], 
+        "image_id": 245915, 
+        "area": 1775.8932499999994, 
+        "bbox": [86, 65, 220, 334]}
+    ],
+    "categories": [
+        {"supercategory": "person", "id": 0, "name": "person"},
+        {"supercategory": "animal", "id": 1, "name": "animal"}
+    ]
+}`;
+          
+        function updateImage(image_num = 0) {
+            // Get the canvas element
+            var canvas = document.getElementById('imageCanvas');
+            var ctx = canvas.getContext('2d');
+
+            // Load the image onto the canvas
+            var image = new Image();
+            
+            image.src = "https://wsrv.nl/?url="+_json.images[image_num].coco_url; // Change the URL to the desired image
+            image_id = _json.images[image_num].id
+            image.onload = function() {
+                canvas.width = this.width;
+                canvas.height = this.height;
+                ctx.drawImage(this, 0, 0);
+                // Draw bounding boxes
+                var annotations = _json.annotations;
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 2;
+                annotations.forEach(function(annotation) {
+                    if (annotation.image_id == image_id) {
+                        var bbox = annotation.bbox;
+                        ctx.strokeRect(bbox[0], bbox[1], bbox[2], bbox[3]);
+                    }                    
+                });
+            };
+            document.getElementById('image-name').innerHTML = _json.images[image_num].file_name
+
+            var rightPanel = document.getElementById('canvasPanel');
+            var canvas = document.getElementById('imageCanvas');
+            
+            if (canvas.width > canvas.height) {
+                rightPanel.style.flexDirection = 'row';
+            } else {
+                rightPanel.style.flexDirection = 'column';
+            } 
+        }
+        
+        function updateSelector(){
+            var select = document.getElementById('image-select');
+            select.innerHTML = '';
+            _json.images.forEach(function(image, i) {
+                var option = document.createElement('option');
+                option.value = i;
+                option.textContent = image.id;
+                select.appendChild(option);
+            });
+        }
+        
+        editor.setValue(jsonData); 
+        _json = JSON.parse(editor.getValue());
+        _imageValue = 0;
+        updateSelector();
+        updateImage(_imageValue);
+
+        document.getElementById('image-select').addEventListener('change', function() {
+            _imageValue = this.value
+            updateImage(_imageValue);
+        });
+
+        editor.on('change', function() {
+            _json = JSON.parse(editor.getValue());
+            updateSelector();
+            updateImage(_imageValue);
+        });
+
+
+    </script>
+</body>
+</html>
