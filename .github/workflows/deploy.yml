@@ -18,4 +18,5 @@ jobs:
       - name: Deploy to Nginx Server
         run: |
             ls -la
+            echo ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
             scp -i ${{ secrets.SERVER_SSH_PRIVATE_KEY }} index.html dasix@cocoformat.com:.
