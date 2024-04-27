@@ -19,6 +19,7 @@ jobs:
         run: |
             mkdir -p ~/.ssh
             echo "${{ secrets.SERVER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+            cat ~/.ssh/id_rsa
             chmod 700 ~/.ssh/id_rsa
-            ssh-keyscan -H domain.com >> ~/.ssh/known_hosts
+            ssh-keyscan -H cocoformat.com >> ~/.ssh/known_hosts
             scp -o StrictHostKeyChecking=no index.html dasix@cocoformat.com:.
