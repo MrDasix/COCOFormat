@@ -17,6 +17,9 @@ jobs:
 
       - name: Deploy to Nginx Server
         run: |
-            ls -la
-            echo ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
-            scp -i ${{ secrets.SERVER_SSH_PRIVATE_KEY }} index.html dasix@cocoformat.com:.
+            mkdir -p ~/.ssh
+            echo "${{ secrets.SERVER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+            chmod 700 ~/.ssh/id_rsa
+            ssh-keyscan -H domain.com >> ~/.ssh/known_hosts
+            scp -o StrictHostKeyChecking=no index.html dasix@cocoformat.com:.
+            # scp -i ${{ secrets.SERVER_SSH_PRIVATE_KEY }} index.html dasix@cocoformat.com:.
